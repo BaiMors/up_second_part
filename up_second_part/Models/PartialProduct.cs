@@ -22,5 +22,7 @@ namespace up_second_part.Models
                 }
             }
         }
+
+        public decimal ReducedCost => ProductCost - (ProductCost / 100 * (decimal)ProductDiscountAmount);
     }
 }

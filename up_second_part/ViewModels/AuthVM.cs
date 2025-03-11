@@ -34,6 +34,8 @@ namespace up_second_part.ViewModels
                 else
                 {
                     MessageBoxManager.GetMessageBoxStandard("Ошибка", "Неправильный логин или пароль", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Warning).ShowAsync();
+                    Login = null;
+                    Password = null;
                     //тут будет капча
                 }
             }

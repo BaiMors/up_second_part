@@ -23,6 +23,8 @@ namespace up_second_part.ViewModels
                 .Include(x => x.ProductMeasurementUnitNavigation)
                 .Include(x => x.ProductSupplierNavigation)
                 .ToList();
+            _numAll = _products.Count;
+            _numSorted = _numAll;
         }
 
         string _searchStr;
@@ -32,7 +34,7 @@ namespace up_second_part.ViewModels
 
         string _selectedDiscount = null;
 
-        List<string> _discounts = new List<string> { "Все  диапазоны", "0-9.99%", "10-14.99%", "15% и более" };
+        List<string> _discounts = new List<string> { "Все диапазоны", "0-9.99%", "10-14.99%", "15% и более" };
         public List<string> Discounts { get => _discounts; }
         public string SelectedDiscount { get { if (_selectedDiscount == null) return Discounts[0]; else return _selectedDiscount; } set { _selectedDiscount = value; DoFilter(); } }
         public string SearchStr { get { return _searchStr; } set { _searchStr = value; DoFilter(); } }
@@ -106,6 +108,7 @@ namespace up_second_part.ViewModels
 
         public void LogOut()
         {
+            //спросить уверен ли пользователь
             MainWindowViewModel.CurrentUser = null;
             MainWindowViewModel.Instance.Us = new AuthView();
         }
