@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:vm="using:up_second_part.ViewModels"
+			 			 xmlns:conv="using:work10_school.Converters"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:DataType="vm:ProductsVM"
+             x:Class="up_second_part.ProductsView">
+
+	<UserControl.Resources>
+		<conv:MyImageConverter x:Key="MyImageConverter"></conv:MyImageConverter>
+	</UserControl.Resources>
+	
+	<Grid RowDefinitions="10*, 90*" ColumnDefinitions="75*, 25*">
+		<Border BorderBrush="Black" BorderThickness="3" Grid.Row="0" Grid.Column="0"></Border>
+		<Border BorderBrush="Red" BorderThickness="3" Grid.Row="1" Grid.Column="0"></Border>
+		<Border BorderBrush="Blue" BorderThickness="3" Grid.Row="0" Grid.Column="1"></Border>
+		<Border BorderBrush="Green" BorderThickness="3" Grid.Row="1" Grid.Column="1"></Border>
+
+		<StackPanel Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left" Orientation="Horizontal">
+			<Image Source="/Assets/icon.ico"></Image>
+			<TextBlock>Список товаров</TextBlock>
+		</StackPanel>
+		
+		<!--<TextBlock Text="{Binding CurrentUser.UserInitials}"></TextBlock>-->
+		<Menu Grid.Row="0" Grid.Column="1" DockPanel.Dock="Top">
+			<MenuItem Header="{Binding CurrentUser.UserInitials}">
+				<MenuItem Command="{Binding LogOut}" Header="Выйти"></MenuItem>
+			</MenuItem>
+		</Menu>
+
+		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Products}">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<Border BorderThickness="2" BorderBrush="#498C51" Margin="10">
+						<Grid ColumnDefinitions="30*, 50*, 20*">
+							<Border BorderBrush="#498C51" BorderThickness="2" Margin="10">
+								<Image Height="100" Width="100" Source="{Binding ProductPhoto, Converter={StaticResource MyImageConverter}}"></Image>
+							</Border>
+							<Border Grid.Column="1" BorderBrush="#498C51" BorderThickness="1" Margin="10">
+								<StackPanel>
+									<TextBlock FontWeight="Bold" Text="{Binding ProductName}"></TextBlock>
+									<TextBlock TextWrapping="Wrap" Text="{Binding ProductDescription}"></TextBlock>
+									<TextBlock TextWrapping="Wrap" Text="{Binding ProductManufacturerNavigation.ManufacturerName, StringFormat='{}Производитель: {0}'}"></TextBlock>
+									<TextBlock Text="{Binding ProductCost, StringFormat='{}Цена: {0:#####}'}"></TextBlock>
+								</StackPanel>
+							</Border>
+							<Border BorderBrush="#498C51" BorderThickness="2" Margin="10" Grid.Column="2" Background="{Binding DiscountColor}">
+								<TextBlock Text="{Binding ProductDiscountAmount}"></TextBlock>
+							</Border>
+						</Grid>
+					</Border>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<TextBlock Grid.Row="1" Grid.Column="0" IsVisible="{Binding NotFound}">По данному запросу ничего не найдено</TextBlock>
+
+		<StackPanel Grid.Row="1" Grid.Column="1">
+			<TextBox Height="40" Text="{Binding SearchStr}"></TextBox>
+			<Border>
+				<StackPanel>
+					<TextBlock Margin="0 7 0 7" TextWrapping="Wrap">Сортировать по стоимости</TextBlock>
+					<StackPanel>
+						<RadioButton IsChecked="{Binding SortUpCost}">По возрастанию</RadioButton>
+						<RadioButton IsChecked="{Binding SortDownCost}">По убыванию</RadioButton>
+					</StackPanel>
+				</StackPanel>
+			</Border>
+			<ComboBox ItemsSource="{Binding Discounts}" SelectedItem="{Binding SelectedDiscount}"></ComboBox>
+		</StackPanel>
+	</Grid>
+</UserControl>
