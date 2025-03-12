@@ -23,6 +23,6 @@ namespace up_second_part.Models
             }
         }
 
-        public decimal ReducedCost => ProductCost - (ProductCost / 100 * (decimal)ProductDiscountAmount);
+        public decimal ReducedCost => (ProductDiscountAmount == 0) ? ProductCost : ProductCost - (ProductCost / 100 * (decimal)ProductDiscountAmount);
     }
 }

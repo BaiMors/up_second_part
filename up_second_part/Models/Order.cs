@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace up_second_part.Models;
 
@@ -23,7 +24,7 @@ public partial class Order
 
     public virtual PickupPoint OrderPickupPointNavigation { get; set; } = null!;
 
-    public virtual ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+    public virtual ObservableCollection<OrderProduct> OrderProducts { get; set; } = new();
 
     public virtual OrderStatus OrderStatusNavigation { get; set; } = null!;
 }

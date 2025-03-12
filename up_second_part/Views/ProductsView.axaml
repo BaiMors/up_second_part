@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:vm="using:up_second_part.ViewModels"
-			 			 xmlns:conv="using:work10_school.Converters"
+			 xmlns:conv="using:work10_school.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -29,6 +29,7 @@
 					</MultiBinding>
 				</TextBlock.Text>
 			</TextBlock>
+			<Button IsVisible="{Binding ShowOrder}" HorizontalAlignment="Right" Command="{Binding ShowOrders}">Посмотреть заказ</Button>
 		</StackPanel>
 		
 		<!--<TextBlock Text="{Binding CurrentUser.UserInitials}"></TextBlock>-->
@@ -41,29 +42,36 @@
 		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Products}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<Border BorderThickness="2" BorderBrush="#498C51" Margin="10">
-						<Grid ColumnDefinitions="30*, 50*, 20*">
-							<Border BorderBrush="#498C51" BorderThickness="2" Margin="10">
-								<Image Height="100" Width="100" Source="{Binding ProductPhoto, Converter={StaticResource MyImageConverter}}"></Image>
-							</Border>
-							<Border Grid.Column="1" BorderBrush="#498C51" BorderThickness="1" Margin="10">
-								<StackPanel>
-									<TextBlock FontWeight="Bold" Text="{Binding ProductName}"></TextBlock>
-									<TextBlock TextWrapping="Wrap" Text="{Binding ProductDescription}"></TextBlock>
-									<TextBlock TextWrapping="Wrap" Text="{Binding ProductManufacturerNavigation.ManufacturerName, StringFormat='{}Производитель: {0}'}"></TextBlock>
-									<StackPanel Orientation="Horizontal">
-										<TextBlock Text="Цена:"></TextBlock>
-										<TextBlock Text="S" Opacity="0"></TextBlock>
-										<TextBlock TextDecorations="Strikethrough" Text="{Binding ProductCost, StringFormat='{}{0:#.####}₽'}"></TextBlock>
-										<TextBlock Text="{Binding ReducedCost, StringFormat='{} {0:#.####}₽'}"></TextBlock>
+					<StackPanel Background="White">
+						<Border BorderThickness="2" BorderBrush="#498C51" Margin="10">
+							<Grid ColumnDefinitions="30*, 50*, 20*">
+								<Border BorderBrush="#498C51" BorderThickness="2" Margin="10">
+									<Image Height="100" Width="100" Source="{Binding ProductPhoto, Converter={StaticResource MyImageConverter}}"></Image>
+								</Border>
+								<Border Grid.Column="1" BorderBrush="#498C51" BorderThickness="1" Margin="10">
+									<StackPanel>
+										<TextBlock FontWeight="Bold" Text="{Binding ProductName}"></TextBlock>
+										<TextBlock TextWrapping="Wrap" Text="{Binding ProductDescription}"></TextBlock>
+										<TextBlock TextWrapping="Wrap" Text="{Binding ProductManufacturerNavigation.ManufacturerName, StringFormat='{}Производитель: {0}'}"></TextBlock>
+										<StackPanel Orientation="Horizontal">
+											<TextBlock Text="Цена:"></TextBlock>
+											<TextBlock Text="S" Opacity="0"></TextBlock>
+											<TextBlock TextDecorations="Strikethrough" Text="{Binding ProductCost, StringFormat='{}{0:#.####}₽'}"></TextBlock>
+											<TextBlock Text="{Binding ReducedCost, StringFormat='{} {0:#.####}₽'}"></TextBlock>
+										</StackPanel>
 									</StackPanel>
-								</StackPanel>
-							</Border>
-							<Border BorderBrush="#498C51" BorderThickness="2" Margin="10" Grid.Column="2" Background="{Binding DiscountColor}">
-								<TextBlock Text="{Binding ProductDiscountAmount, StringFormat='{}{0}%'}"></TextBlock>
-							</Border>
-						</Grid>
-					</Border>
+								</Border>
+								<Border BorderBrush="#498C51" BorderThickness="2" Margin="10" Grid.Column="2" Background="{Binding DiscountColor}">
+									<TextBlock Text="{Binding ProductDiscountAmount, StringFormat='{}{0}%'}"></TextBlock>
+								</Border>
+							</Grid>
+						</Border>
+						<StackPanel.ContextMenu>
+							<ContextMenu>
+								<MenuItem Header="Добавить к заказу" Command="{Binding $parent[UserControl].((vm:ProductsVM)DataContext).AddToOrder}" CommandParameter="{Binding ProductArticleNumber}"></MenuItem>
+							</ContextMenu>
+						</StackPanel.ContextMenu>
+					</StackPanel>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>

@@ -9,6 +9,7 @@ namespace up_second_part.ViewModels
         #region Properties
         public static Postgres2Context myConnection = new Postgres2Context();
         public static User CurrentUser = new User(); 
+        public static Order CurrentOrder = new Order(); 
 
         public static MainWindowViewModel Instance; // создаем объект для обращения к другим объектам данного класса
         public MainWindowViewModel()

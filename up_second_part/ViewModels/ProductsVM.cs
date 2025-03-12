@@ -1,8 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Avalonia.Controls;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MsBox.Avalonia;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,6 +30,7 @@ namespace up_second_part.ViewModels
                 .ToList();
             _numAll = _products.Count;
             _numSorted = _numAll;
+            _pickupPoints = MainWindowViewModel.myConnection.PickupPoints.ToList();
         }
 
         string _searchStr;
@@ -46,7 +52,28 @@ namespace up_second_part.ViewModels
         public int NumSorted { get => _numSorted; set { this.RaiseAndSetIfChanged(ref _numSorted, value); } }
         public bool _notFound = false;
         public bool NotFound { get => _notFound; set => this.RaiseAndSetIfChanged(ref _notFound, value); }
+        public bool _showOrder = false;
+        public bool ShowOrder { get => _showOrder; set => this.RaiseAndSetIfChanged(ref _showOrder, value); }
+        public bool _showClient = false;
+        public bool ShowClient { get => _showClient; set => this.RaiseAndSetIfChanged(ref _showClient, value); }
+        Order _newOrder;
+        public Order NewOrder
+        {
+            get => MainWindowViewModel.CurrentOrder;
+            set
+            {
+                MainWindowViewModel.CurrentOrder = value;
+                this.RaisePropertyChanged();
+            }
+        }
+        public decimal OrderSum => NewOrder.OrderProducts.Sum(x => x.ProductArticleNumberNavigation.ProductCost);
 
+        public float OrderDiscountSum => NewOrder.OrderProducts.Sum(x => x.ProductArticleNumberNavigation.ProductDiscountAmount);
+
+        List<PickupPoint> _pickupPoints;
+        public List<PickupPoint> PickupPoints { get => _pickupPoints; set => this.RaiseAndSetIfChanged(ref _pickupPoints, value); }
+        PickupPoint _selectedPoint;
+        public PickupPoint SelectedPoint { get => _selectedPoint; set => _selectedPoint = value; }
 
         void DoFilter()
         {
@@ -111,6 +138,82 @@ namespace up_second_part.ViewModels
             //спросить уверен ли пользователь
             MainWindowViewModel.CurrentUser = null;
             MainWindowViewModel.Instance.Us = new AuthView();
+        }
+
+        public void AddToOrder(string article)
+        {
+            Product _productToAdd = Products.First(x => x.ProductArticleNumber == article);
+
+            if (NewOrder.OrderProducts.Any(x => x.ProductArticleNumberNavigation == _productToAdd))
+            {
+                NewOrder.OrderProducts.Where(x => x.ProductArticleNumberNavigation == _productToAdd).First().ProductCount++;
+            }
+            else
+            {
+                NewOrder.OrderProducts.Add(new OrderProduct { ProductArticleNumber = article, ProductArticleNumberNavigation = _productToAdd, ProductCount = 1 });
+            }
+            
+            MainWindowViewModel.CurrentOrder = NewOrder;
+            ShowOrder = true;
+            //MessageBoxManager.GetMessageBoxStandard("Успех", "Товар "+ _productToAdd.ProductName + " добавлен в заказ", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success, WindowStartupLocation.CenterScreen).ShowAsync();
+        }
+
+        public void RemoveFromOrder(string article)
+        {
+            Product _productToRemove = Products.First(x => x.ProductArticleNumber == article);
+            NewOrder.OrderProducts.Remove(NewOrder.OrderProducts.First(x => x.ProductArticleNumberNavigation == _productToRemove));
+            this.RaisePropertyChanged(nameof(NewOrder.OrderProducts));
+            this.RaisePropertyChanged(nameof(OrderSum));
+            this.RaisePropertyChanged(nameof(OrderDiscountSum));
+        }
+
+        public async Task ShowOrders()
+        {
+            NewOrder.OrderClient = MainWindowViewModel.CurrentUser.UserId;
+            NewOrder.OrderClientNavigation = MainWindowViewModel.CurrentUser;
+            if (NewOrder.OrderClient != 0)
+            {
+                ShowClient = true;
+            }
+
+            var window = new Window();
+            window.Content = new OrderView();
+            window.Title = "Просмотр заказа";
+            window.Show();
+        }
+
+        public void SaveChangesInOrder()
+        {
+            //добавить проверку заполнения полей
+            Random _rnd = new Random();
+            NewOrder.OrderDate = DateTime.Now;
+            NewOrder.OrderStatus = 1;
+
+            NewOrder.OrderReceiptCode = (short)_rnd.Next(100, 1000);
+            NewOrder.OrderPickupPoint = NewOrder.OrderPickupPointNavigation.Id;
+
+            if (NewOrder.OrderProducts.Any(x => x.ProductArticleNumberNavigation.ProductQuantityInStock < 3))
+            {
+                NewOrder.OrderDeliveryDate = DateTime.Now.AddDays(6);
+            }
+            else
+            {
+                NewOrder.OrderDeliveryDate = DateTime.Now.AddDays(3);
+            }
+
+            if (NewOrder.OrderId == 0)
+            {
+                MainWindowViewModel.myConnection.Orders.Add(NewOrder);
+                MainWindowViewModel.myConnection.OrderProducts.AddRange(NewOrder.OrderProducts);
+            }
+            MainWindowViewModel.myConnection.SaveChanges();
+            //не забыть очистить корзину после
+            NewOrder = new Order();
+            ShowOrder = false;
+            MessageBoxManager.GetMessageBoxStandard("Успех", "Заказ успешно оформлен! Вы можете закрыть окно", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success, WindowStartupLocation.CenterScreen).ShowAsync();
+            //добавить трай кетч
+            //очистить значения сумм
+            //перепроверить, скрывается ли кнопка снова до добавления в заказ хоты бя одного товара
         }
     }
 }
