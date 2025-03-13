@@ -31,13 +31,15 @@ namespace up_second_part.ViewModels
             _numAll = _products.Count;
             _numSorted = _numAll;
             _pickupPoints = MainWindowViewModel.myConnection.PickupPoints.ToList();
+            if (MainWindowViewModel.CurrentUser.UserRole == 1 || MainWindowViewModel.CurrentUser.UserRole == 2)
+            {
+                IsOrderListVisible = true;
+            }
         }
 
         string _searchStr;
-
         bool _sortUpCost = false;
         bool _sortDownCost = false;
-
         string _selectedDiscount = null;
 
         List<string> _discounts = new List<string> { "Все диапазоны", "0-9.99%", "10-14.99%", "15% и более" };
@@ -46,16 +48,21 @@ namespace up_second_part.ViewModels
         public string SearchStr { get { return _searchStr; } set { _searchStr = value; DoFilter(); } }
         public bool SortUpCost { get => _sortUpCost; set { this.RaiseAndSetIfChanged(ref _sortUpCost, value); DoFilter(); } }
         public bool SortDownCost { get => _sortDownCost; set { this.RaiseAndSetIfChanged(ref _sortDownCost, value); DoFilter(); } }
+        
         public int _numAll;
         public int NumAll { get => _numAll; set { this.RaiseAndSetIfChanged(ref _numAll, value); } }
         public int _numSorted;
         public int NumSorted { get => _numSorted; set { this.RaiseAndSetIfChanged(ref _numSorted, value); } }
         public bool _notFound = false;
         public bool NotFound { get => _notFound; set => this.RaiseAndSetIfChanged(ref _notFound, value); }
-        public bool _showOrder = false;
-        public bool ShowOrder { get => _showOrder; set => this.RaiseAndSetIfChanged(ref _showOrder, value); }
-        public bool _showClient = false;
-        public bool ShowClient { get => _showClient; set => this.RaiseAndSetIfChanged(ref _showClient, value); }
+        
+        public bool _isOrderVisible = false;
+        public bool IsOrderVisible { get => _isOrderVisible; set => this.RaiseAndSetIfChanged(ref _isOrderVisible, value); }
+        public bool _isClientVisible = false;
+        public bool IsClientVisible { get => _isClientVisible; set => this.RaiseAndSetIfChanged(ref _isClientVisible, value); }
+        public bool _isOrderListVisible = false;
+        public bool IsOrderListVisible { get => _isOrderListVisible; set => this.RaiseAndSetIfChanged(ref _isOrderListVisible, value); }
+        
         Order _newOrder;
         public Order NewOrder
         {
@@ -66,14 +73,12 @@ namespace up_second_part.ViewModels
                 this.RaisePropertyChanged();
             }
         }
-        public decimal OrderSum => NewOrder.OrderProducts.Sum(x => x.ProductArticleNumberNavigation.ProductCost);
 
+        public decimal OrderSum => NewOrder.OrderProducts.Sum(x => x.ProductArticleNumberNavigation.ReducedCost);
         public float OrderDiscountSum => NewOrder.OrderProducts.Sum(x => x.ProductArticleNumberNavigation.ProductDiscountAmount);
 
         List<PickupPoint> _pickupPoints;
         public List<PickupPoint> PickupPoints { get => _pickupPoints; set => this.RaiseAndSetIfChanged(ref _pickupPoints, value); }
-        PickupPoint _selectedPoint;
-        public PickupPoint SelectedPoint { get => _selectedPoint; set => _selectedPoint = value; }
 
         void DoFilter()
         {
@@ -140,6 +145,7 @@ namespace up_second_part.ViewModels
             MainWindowViewModel.Instance.Us = new AuthView();
         }
 
+        #region формирование_заказа
         public void AddToOrder(string article)
         {
             Product _productToAdd = Products.First(x => x.ProductArticleNumber == article);
@@ -152,9 +158,9 @@ namespace up_second_part.ViewModels
             {
                 NewOrder.OrderProducts.Add(new OrderProduct { ProductArticleNumber = article, ProductArticleNumberNavigation = _productToAdd, ProductCount = 1 });
             }
-            
+
             MainWindowViewModel.CurrentOrder = NewOrder;
-            ShowOrder = true;
+            IsOrderVisible = true;
             //MessageBoxManager.GetMessageBoxStandard("Успех", "Товар "+ _productToAdd.ProductName + " добавлен в заказ", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success, WindowStartupLocation.CenterScreen).ShowAsync();
         }
 
@@ -167,13 +173,13 @@ namespace up_second_part.ViewModels
             this.RaisePropertyChanged(nameof(OrderDiscountSum));
         }
 
-        public async Task ShowOrders()
+        public async Task ShowOrder()
         {
             NewOrder.OrderClient = MainWindowViewModel.CurrentUser.UserId;
             NewOrder.OrderClientNavigation = MainWindowViewModel.CurrentUser;
             if (NewOrder.OrderClient != 0)
             {
-                ShowClient = true;
+                IsClientVisible = true;
             }
 
             var window = new Window();
@@ -209,11 +215,17 @@ namespace up_second_part.ViewModels
             MainWindowViewModel.myConnection.SaveChanges();
             //не забыть очистить корзину после
             NewOrder = new Order();
-            ShowOrder = false;
+            IsOrderVisible = false;
             MessageBoxManager.GetMessageBoxStandard("Успех", "Заказ успешно оформлен! Вы можете закрыть окно", MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Success, WindowStartupLocation.CenterScreen).ShowAsync();
             //добавить трай кетч
             //очистить значения сумм
-            //перепроверить, скрывается ли кнопка снова до добавления в заказ хоты бя одного товара
+            //перепроверить, скрывается ли кнопка снова до добавления в заказ хоты бя одного товара (после того как заказали)
+        }
+        #endregion
+
+        public void ShowOrderList()
+        {
+            MainWindowViewModel.Instance.Us = new OrderListView();
         }
     }
 }

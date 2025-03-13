@@ -1,7 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 		xmlns:vm="using:up_second_part.ViewModels"
-		xmlns:conv="using:work10_school.Converters"
+			 xmlns:vm="using:up_second_part.ViewModels"
+			 xmlns:conv="using:up_second_part.Converters"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
@@ -13,6 +13,7 @@
 
 	<Grid RowDefinitions="10*, 80*, 10*">
 		<StackPanel Grid.Row="0" Orientation="Horizontal">
+			<TextBlock>Просмотр заказа</TextBlock>
 			<ComboBox ItemsSource="{Binding PickupPoints}" SelectedItem="{Binding NewOrder.OrderPickupPointNavigation}">
 				<ComboBox.ItemTemplate>
 					<DataTemplate>
@@ -21,8 +22,8 @@
 				</ComboBox.ItemTemplate>
 			</ComboBox>
 			<TextBlock Text="{Binding NewOrder.OrderClientNavigation.UserInitials}" HorizontalAlignment="Right"></TextBlock>
-			<TextBlock Text="{Binding OrderDiscountSum, StringFormat='{}Суммарная скидка:{0}'}"></TextBlock>
-			<TextBlock Text="{Binding OrderSum, StringFormat='{}Сумма заказа:{0}'}"></TextBlock>
+			<TextBlock Text="{Binding OrderDiscountSum, StringFormat='{}Суммарная скидка:{0:#.####}%'}"></TextBlock>
+			<TextBlock Text="{Binding OrderSum, StringFormat='{}Сумма заказа:{0:#.####}'}"></TextBlock>
 		</StackPanel>
 		
 		<ListBox Grid.Row="1" ItemsSource="{Binding NewOrder.OrderProducts}">
@@ -45,6 +46,7 @@
 											<TextBlock TextDecorations="Strikethrough" Text="{Binding ProductArticleNumberNavigation.ProductCost, StringFormat='{}{0:#.####}₽'}"></TextBlock>
 											<TextBlock Text="{Binding ProductArticleNumberNavigation.ReducedCost, StringFormat='{} {0:#.####}₽'}"></TextBlock>
 										</StackPanel>
+										<!--поменять обычное поле ввода на то числовое со стрелочками + сказать что это именно количество товара-->
 										<TextBox Text="{Binding ProductCount}"></TextBox>
 									</StackPanel>
 								</Border>
@@ -62,6 +64,9 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<Button Grid.Row="2" Command="{Binding SaveChangesInOrder}">Сохранить изменения</Button>
+		<StackPanel Grid.Row="2">
+			<Button Click="GeneratePdf">Экспорт в PDF</Button>
+			<Button Command="{Binding SaveChangesInOrder}">Сохранить изменения</Button>
+		</StackPanel>
 	</Grid>
 </UserControl>
