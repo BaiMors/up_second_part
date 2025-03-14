@@ -7,7 +7,7 @@
         x:Class="up_second_part.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/icon.ico"
-        Title="up_second_part">
+        Title="Пиши-стирай">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,

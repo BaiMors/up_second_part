@@ -11,17 +11,14 @@
 	<UserControl.Resources>
 		<conv:MyImageConverter x:Key="MyImageConverter"></conv:MyImageConverter>
 	</UserControl.Resources>
-	
-	<Grid RowDefinitions="10*, 90*" ColumnDefinitions="75*, 25*">
-		<Border BorderBrush="Black" BorderThickness="3" Grid.Row="0" Grid.Column="0"></Border>
-		<Border BorderBrush="Red" BorderThickness="3" Grid.Row="1" Grid.Column="0"></Border>
-		<Border BorderBrush="Blue" BorderThickness="3" Grid.Row="0" Grid.Column="1"></Border>
-		<Border BorderBrush="Green" BorderThickness="3" Grid.Row="1" Grid.Column="1"></Border>
 
-		<Grid ColumnDefinitions="20*, 20*, 20*, 20*, 20*" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
-			<Image Grid.Column="0" Source="/Assets/logo.png"></Image>
-			<TextBlock Grid.Column="1">Список товаров</TextBlock>
-			<TextBlock Grid.Column="2">
+	<Grid RowDefinitions="10*, 90*" ColumnDefinitions="80*, 20*">
+		<Border BorderBrush="Blue" Background="#498C51" Opacity="0.7" CornerRadius="7" BorderThickness="" Grid.Row="1" Grid.Column="1"></Border>
+		
+		<Grid ColumnDefinitions="5*, 20*, 15*, 40*, 20*" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Left">
+			<Image Margin="3" Grid.Column="0" Source="/Assets/logo.png"></Image>
+			<TextBlock Padding="7" VerticalAlignment="Center" FontSize="20" Grid.Column="1">Список товаров</TextBlock>
+			<TextBlock Padding="7" VerticalAlignment="Center" FontSize="20" Grid.Column="2">
 				<TextBlock.Text>
 					<MultiBinding StringFormat="{} {0} из {1}">
 						<Binding Path="NumSorted"/>
@@ -29,26 +26,26 @@
 					</MultiBinding>
 				</TextBlock.Text>
 			</TextBlock>
-			<Button Grid.Column="4" IsVisible="{Binding IsOrderVisible}" HorizontalAlignment="Right" Command="{Binding ShowOrder}">Посмотреть заказ</Button>
-			<Button Grid.Column="3" IsVisible="{Binding IsOrderListVisible}" HorizontalAlignment="Right" Command="{Binding ShowOrderList}">Посмотреть список заказов</Button>
+			<Button Classes="bAuth" Margin="10" Background="#498C51" HorizontalAlignment="Right" Grid.Column="4" IsVisible="{Binding IsOrderVisible}" Command="{Binding ShowOrder}">Посмотреть заказ</Button>
+			<Button Classes="bAuth" Margin="10" Background="#498C51" HorizontalAlignment="Right" Width="300" Grid.Column="3" IsVisible="{Binding IsOrderListVisible}" Command="{Binding ShowOrderList}">Посмотреть список заказов</Button>
 		</Grid>
-		
-		<Menu Grid.Row="0" Grid.Column="1" DockPanel.Dock="Top">
-			<MenuItem Header="{Binding CurrentUser.UserInitials}">
-				<MenuItem Command="{Binding LogOut}" Header="Выйти"></MenuItem>
+
+		<Menu Width="250" Grid.Row="0" Grid.Column="1" DockPanel.Dock="Top">
+			<MenuItem Width="250" Padding="5" VerticalAlignment="Center" FontSize="16" Header="{Binding CurrentUser.UserInitials}">
+				<MenuItem Width="250" Command="{Binding LogOut}" Header="Выйти"></MenuItem>
 			</MenuItem>
 		</Menu>
 
-		<ListBox Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Products}">
+		<ListBox Grid.Row="1" Grid.Column="0" Background="White" ItemsSource="{Binding Products}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<StackPanel Background="White">
-						<Border BorderThickness="2" BorderBrush="#498C51" Margin="10">
+						<Border BorderThickness="0" BorderBrush="#498C51" Margin="10" CornerRadius="7">
 							<Grid ColumnDefinitions="30*, 50*, 20*">
-								<Border BorderBrush="#498C51" BorderThickness="2" Margin="10">
+								<Border BorderBrush="#498C51" BorderThickness="3" CornerRadius="7" Margin="10">
 									<Image Height="100" Width="100" Source="{Binding ProductPhoto, Converter={StaticResource MyImageConverter}}"></Image>
 								</Border>
-								<Border Grid.Column="1" BorderBrush="#498C51" BorderThickness="1" Margin="10">
+								<Border Grid.Column="1" BorderBrush="#498C51" BorderThickness="3" Margin="10" Padding="10" CornerRadius="7">
 									<StackPanel>
 										<TextBlock FontWeight="Bold" Text="{Binding ProductName}"></TextBlock>
 										<TextBlock TextWrapping="Wrap" Text="{Binding ProductDescription}"></TextBlock>
@@ -61,8 +58,8 @@
 										</StackPanel>
 									</StackPanel>
 								</Border>
-								<Border BorderBrush="#498C51" BorderThickness="2" Margin="10" Grid.Column="2" Background="{Binding DiscountColor}">
-									<TextBlock Text="{Binding ProductDiscountAmount, StringFormat='{}{0}%'}"></TextBlock>
+								<Border BorderBrush="#498C51" CornerRadius="7" BorderThickness="3" Margin="10" Grid.Column="2" Background="{Binding DiscountColor}">
+									<TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20" Text="{Binding ProductDiscountAmount, StringFormat='{}{0}%'}"></TextBlock>
 								</Border>
 							</Grid>
 						</Border>
@@ -75,20 +72,22 @@
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
-		<TextBlock Grid.Row="1" Grid.Column="0" IsVisible="{Binding NotFound}">По данному запросу ничего не найдено</TextBlock>
+		<TextBlock Padding="7" VerticalAlignment="Center" FontSize="20" Grid.Row="1" Grid.Column="0" IsVisible="{Binding NotFoundProducts}">По данному запросу ничего не найдено</TextBlock>
 
-		<StackPanel Grid.Row="1" Grid.Column="1">
-			<TextBox Height="40" Text="{Binding SearchStr}"></TextBox>
-			<Border>
+		<StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
+			<TextBox Margin="7" Background="White" BorderBrush="#498C51" BorderThickness="" Watermark="Поиск по наименованию..." Padding="7" VerticalAlignment="Center" FontSize="16" Height="40" Text="{Binding SearchStr}"></TextBox>
+			<Border BorderBrush="#498C51" Background="White" CornerRadius="7" BorderThickness="1" Margin="7" Padding="7">
 				<StackPanel>
-					<TextBlock Margin="0 7 0 7" TextWrapping="Wrap">Сортировать по стоимости</TextBlock>
-					<StackPanel>
-						<RadioButton IsChecked="{Binding SortUpCost}">По возрастанию</RadioButton>
-						<RadioButton IsChecked="{Binding SortDownCost}">По убыванию</RadioButton>
-					</StackPanel>
+					<TextBlock Padding="7" VerticalAlignment="Center" FontSize="16" Margin="0 7 0 7" TextAlignment="Left" TextWrapping="Wrap">Сортировать по стоимости</TextBlock>
+					<Border>
+						<StackPanel>
+							<RadioButton Padding="7" VerticalAlignment="Center" FontSize="16" IsChecked="{Binding SortUpCost}">По возрастанию</RadioButton>
+							<RadioButton Padding="7" VerticalAlignment="Center" FontSize="16" IsChecked="{Binding SortDownCost}">По убыванию</RadioButton>
+						</StackPanel>
+					</Border>
 				</StackPanel>
 			</Border>
-			<ComboBox ItemsSource="{Binding Discounts}" SelectedItem="{Binding SelectedDiscount}"></ComboBox>
+			<ComboBox BorderThickness="" Background="White" BorderBrush="#498C51" Width="250" Margin="7" FontSize="16" ItemsSource="{Binding Discounts}" SelectedItem="{Binding SelectedDiscount}"></ComboBox>
 		</StackPanel>
 	</Grid>
 </UserControl>

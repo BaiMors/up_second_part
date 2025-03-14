@@ -16,6 +16,9 @@ namespace up_second_part.ViewModels
         string _password;
         public string Password { get => _password; set => this.RaiseAndSetIfChanged(ref _password, value); }
 
+        /// <summary>
+        /// Метод авторизации
+        /// </summary>
         public void LogIn()
         {
             try
@@ -44,6 +47,10 @@ namespace up_second_part.ViewModels
                 MessageBoxManager.GetMessageBoxStandard("Ошибка", ex.Message, MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error).ShowAsync();
             }
         }
+
+        /// <summary>
+        /// Метод для обеспечения авторизации как гость
+        /// </summary>
         public void LogInAsGuest()
         {
             try

@@ -10,7 +10,11 @@ using QuestPDF.Infrastructure;
 using PdfSharpCore;
 using PdfSharpCore.Drawing;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using PdfSharp.Pdf;
+using up_second_part.Models;
+using MsBox.Avalonia;
 
 namespace up_second_part;
 
@@ -26,15 +30,28 @@ public partial class OrderView : UserControl
     {
         try
         {
+            Order order = MainWindowViewModel.myConnection.Orders.Where(x => x.OrderId == MainWindowViewModel.myConnection.Orders.Max(x => x.OrderId)).First();
+
+            var parentWindow = this.VisualRoot as Window;
+
             // Создаем PDF-документ
             PdfSharpCore.Pdf.PdfDocument document = new PdfSharpCore.Pdf.PdfDocument();
             PdfSharpCore.Pdf.PdfPage page = document.AddPage();
             XGraphics gfx = XGraphics.FromPdfPage(page);
-            XFont font = new XFont("Arial", 12);
+            XFont font = new XFont("Comic Sans MS", 12);
+            XFont font1 = new XFont("Comic Sans MS", 20);
 
             // Добавляем данные
-            gfx.DrawString("Пример документа", font, XBrushes.Black, new XPoint(50, 50));
-            gfx.DrawString($"Дата: {DateTime.Now}", font, XBrushes.Black, new XPoint(50, 70));
+            string products = string.Join(", ", order.OrderProducts.Select(w => w.ProductArticleNumberNavigation.ProductName + " " + w.ProductCount.ToString() + " " + w.ProductArticleNumberNavigation.ProductMeasurementUnitNavigation.MeasurementUnitName));
+            gfx.DrawString("Талон для получения", font, XBrushes.Black, new XPoint(50, 50));
+            gfx.DrawString($"Дата заказа: {order.OrderDate}", font, XBrushes.Black, new XPoint(50, 70));
+            gfx.DrawString($"Дата доставки: {order.OrderDeliveryDate}", font, XBrushes.Black, new XPoint(50, 90));
+            gfx.DrawString($"Номер заказа: {order.OrderId}", font, XBrushes.Black, new XPoint(50, 110));
+            gfx.DrawString($"Сумма заказа: {order.OrderSum}", font, XBrushes.Black, new XPoint(50, 130));
+            gfx.DrawString($"Сумма скидки: {order.OrderDiscountSum}", font, XBrushes.Black, new XPoint(50, 150));
+            gfx.DrawString($"Пункт выдачи: {order.OrderPickupPointNavigation.PickupPointAddress}", font, XBrushes.Black, new XPoint(50, 170));
+            gfx.DrawString($"Состав заказа: {products}", font, XBrushes.Black, new XPoint(50, 190));
+            gfx.DrawString($"Код получения: {order.OrderReceiptCode}", font1, XBrushes.Black, new XPoint(50, 240));
 
             // Диалог сохранения файла
             var saveDialog = new SaveFileDialog
@@ -42,73 +59,21 @@ public partial class OrderView : UserControl
                 Title = "Сохранить PDF",
                 DefaultExtension = "pdf",
                 Filters = { new FileDialogFilter { Name = "PDF-файлы", Extensions = { "pdf" } } },
-                InitialFileName = "document.pdf"
+                InitialFileName = "Талон.pdf"
             };
 
-            var parentWindow = this.VisualRoot as Window;
-            var filePath = await saveDialog.ShowAsync(parentWindow); // Асинхронное открытие диалога
+            
+            var filePath = await saveDialog.ShowAsync(parentWindow);
 
             if (filePath != null)
             {
-                document.Save(filePath); // Сохраняем по выбранному пути
+                document.Save(filePath);
                 document.Close();
-
-                // Опционально: уведомление об успешном сохранении
-                //var messageBox = new MessageBox("Успех", "Файл успешно сохранен!");
-                //await messageBox.ShowDialog(this);
             }
         }
         catch (Exception ex)
         {
-            // Обработка ошибок (например, недостаточно прав)
-            //var errorBox = new MessageBox("Ошибка", $"Не удалось сохранить файл: {ex.Message}");
-            //await errorBox.ShowDialog(this);
+            MessageBoxManager.GetMessageBoxStandard("Ошибка", ex.Message, MsBox.Avalonia.Enums.ButtonEnum.Ok, MsBox.Avalonia.Enums.Icon.Error).ShowAsync();
         }
     }
-
-    //private async void GeneratePdf(object sender, RoutedEventArgs e)
-    //{
-    //    var parentWindow = this.VisualRoot as Window;
-    //    var saveDialog = new SaveFileDialog
-    //    {
-    //        Title = "Сохранить PDF",
-    //        DefaultExtension = "pdf",
-    //        Filters = { new FileDialogFilter { Name = "PDF", Extensions = { "pdf" } } },
-    //        InitialFileName = "report.pdf"
-    //    };
-
-    //    var filePath = await saveDialog.ShowAsync(parentWindow);
-
-    //    if (filePath != null)
-    //    {
-    //        try
-    //        {
-    //            // Создаем PDF-документ
-    //            QuestPDF.Fluent.Document.Create(container =>
-    //            {
-    //                container.Page(page =>
-    //                {
-    //                    page.Content()
-    //                        .Padding(20)
-    //                        .Text("Пример документа")
-    //                        .FontSize(14);
-    //                });
-    //            })
-    //            .GeneratePdf(filePath); // Сохраняем документ по выбранному пути
-
-    //            // Уведомляем пользователя об успешном сохранении
-    //            //var messageBox = new MessageBox("Успех", "Файл успешно сохранен!");
-    //            //await messageBox.ShowDialog(this);
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            // Обработка ошибок
-    //            Console.WriteLine(ex.Message);
-    //            //var errorBox = new MessageBox("Ошибка", $"Не удалось сохранить файл: {ex.Message}");
-    //            //await errorBox.ShowDialog(this);
-    //        }
-    //    }
-    //}
-
-
 }

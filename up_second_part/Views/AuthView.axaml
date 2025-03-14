@@ -6,10 +6,10 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 x:DataType="vm:AuthVM"
              x:Class="up_second_part.AuthView">
-	<Grid RowDefinitions="30*, 20*, 20*, 15*, 15*">
-		<TextBox Grid.Row="1" Text="{Binding Login}"></TextBox>
-		<TextBox Grid.Row="2" Text="{Binding Password}"></TextBox>
-		<Button Grid.Row="3" Command="{Binding LogIn}">Войти</Button>
-		<Button Grid.Row="4" Command="{Binding LogInAsGuest}">Войти гостем</Button>
+	<Grid RowDefinitions="30*, 15*, 15*, 10*, 10*, 20*">
+		<TextBox Watermark="Логин" Classes="tbAuth" Grid.Row="1" Text="{Binding Login}"></TextBox>
+		<TextBox Watermark="Пароль" Classes="tbAuth" Grid.Row="2" Text="{Binding Password}"></TextBox>
+		<Button Classes="bAuth" Grid.Row="3" Command="{Binding LogIn}">Войти</Button>
+		<Button Classes="bAuth" Grid.Row="4" Command="{Binding LogInAsGuest}">Войти гостем</Button>
 	</Grid>
 </UserControl>
